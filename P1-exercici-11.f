@@ -27,7 +27,7 @@ C VARIABLES PROBLEM 4
       INTEGER*4 COUNTER(1:N)
       REAL*8 DICE, PROB(1:N), RND
 C ----------------------------- PRACTICA 2 -------------------------------
-
+      INTEGER*4 ENERGY
 
 
 C ------------------------------------------------------------------------      
@@ -112,6 +112,7 @@ C DEFINITION OF THE PROBABILITY VECTOR
       ENDDO
 
 
+      CALL ENERG(S, L)
 C ------------------------------------------------------------------------      
 C ----------------------------- PRACTICA 2 -------------------------------
 C ------------------------------------------------------------------------
@@ -177,6 +178,50 @@ C SUBRUTINE WHICH WRITES ONLY THE PAIRS OF THE POSITIVE SPINS
             CLOSE(10)
       END
 
+C SUBROUTINE WHICH CALCULATES THE ENERGY OF A SYSTEM BASED ON ISING HAMILTONIAN MODEL
+
+      SUBROUTINE ENERG(S, L)
+            IMPLICIT NONE
+            INTEGER*4 L, I, J, ENERGY
+            INTEGER*2 S(1:L, 1:L)
+            ENERGY = 0 
+            DO I = 1, L
+                  DO J = 1, L 
+C CONDICIOES DE LAS EZQUINAS 
+                        IF ((I .EQ. 1) .AND. (J .EQ. 1)) THEN
+                              ENERGY = ENERGY + S(1,1)*( S(1, L) + 
+     *                                 S(1, 2) + S(L, 1) + S(2, 1))
+                        ELSEIF ((I .EQ. 1) .AND. (J .EQ. L)) THEN 
+                              ENERGY = ENERGY + S(1,L)*(S(1,1) +
+     *                                 S(1,L-1) + S(L,L) + S(2, L))
+                        ELSEIF ((I .EQ. L) .AND. (J .EQ. 1)) THEN 
+                              ENERGY = ENERGY + S(L,1)*(S(1,1) +
+     *                                 S(L-1,1) + S(L,L) + S(L, 2))
+                        ELSEIF ((I .EQ. L) .AND. (J .EQ. L)) THEN 
+                              ENERGY = ENERGY + S(L,L)*(S(1,L) +
+     *                                 S(L,1) + S(L-1,L) + S(L, L-1))
+C CONDITIONS FOR THE LATERAL LINES 
+                        ELSEIF (I .EQ. 1) THEN 
+                              ENERGY = ENERGY + S(1,J)*(S(1,J-1) +
+     *                                 S(1,J+1) + S(L,J) + S(2, J))
+                        ELSEIF (J .EQ. 1) THEN 
+                              ENERGY = ENERGY + S(I,1)*(S(I-1,1) +
+     *                                 S(I+1,1) + S(I,L) + S(I, 2))
+                        ELSEIF (I .EQ. L) THEN 
+                              ENERGY = ENERGY + S(L,J)*(S(L,J-1) +
+     *                                 S(L,J+1) + S(L-1,J) + S(1, J))
+                        ELSEIF (J .EQ. L) THEN 
+                              ENERGY = ENERGY + S(I,L)*(S(I-1,L) +
+     *                                 S(I+1,L) + S(I,L-1) + S(1, L))
+                        ELSE
+                              ENERGY = ENERGY + S(I, J)*(S(I-1, J)  + 
+     *                               S(I+1, J) + S(I, J-1) + S(I, J+1))
+                        ENDIF
+                  ENDDO
+            ENDDO
+            PRINT*, ENERGY
+      RETURN 
+      END 
 
 
 
@@ -196,13 +241,9 @@ C SUBRUTINE WHICH WRITES ONLY THE PAIRS OF THE POSITIVE SPINS
 
 
 
-
-
-
-
-C ************************************************************************
-C 				     MT19937 CODE 
-C ************************************************************************
+C ************************************************************************************
+C 				              MT19937 CODE 
+C ************************************************************************************
 
 cc
 c  A C-program for MT19937, with initialization improved 2002/1/26.
